@@ -3,7 +3,11 @@ console.log("[HOOK FILE] execution-hooks.js loaded at:", new Date().toISOString(
 // Supabase configuration from environment variables
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
-const INSTANCE_ID = process.env.INSTANCE_ID || 'teku';
+const INSTANCE_ID = process.env.INSTANCE_ID;
+
+if (!INSTANCE_ID) {
+  console.warn("[HOOK] WARNING: INSTANCE_ID env var is not set! Executions will be tagged as 'UNCONFIGURED'. Set INSTANCE_ID=<client_name> in your environment variables.");
+}
 
 // Helper function to insert execution log into Supabase
 async function logToSupabase(data) {
@@ -94,7 +98,7 @@ module.exports = {
         // Prepare log data for Supabase
         const logData = {
           execution_id: executionId,
-          instance_id: INSTANCE_ID,
+          instance_id: INSTANCE_ID || 'UNCONFIGURED',
           workflow_id: workflowData?.id,
           workflow_name: workflowData?.name,
           status: fullRunData?.status || (fullRunData?.finished ? "success" : "error"),
